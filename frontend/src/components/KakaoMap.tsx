@@ -14,6 +14,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
+import { Shelter } from '../data/shelters';
 
 // =============================================================================
 // 📝 타입 정의
@@ -37,17 +38,27 @@ interface MapMarker {
   content?: string;
 }
 
-/**
- * 카카오 맵 컴포넌트 Props
- */
-interface KakaoMapProps {
-  center: Coordinates;           // 지도 중심 좌표
-  level?: number;               // 지도 확대/축소 레벨 (1-14, 기본값: 3)
-  markers?: MapMarker[];        // 마커 배열
-  onMarkerClick?: (marker: MapMarker) => void; // 마커 클릭 이벤트
-  onMapClick?: (coordinates: Coordinates) => void; // 지도 클릭 이벤트
-  style?: React.CSSProperties;  // 지도 컨테이너 스타일
+interface SearchLocation {
+  name: string;
+  lat: number;
+  lng: number;
+  style?: React.CSSProperties;
 }
+
+interface KakaoMapProps {
+  searchLocation: SearchLocation | null;
+  shelters: Shelter[];
+  style?: React.CSSProperties;
+}
+
+// =============================================================================
+// 🗺️ 상수 정의
+// =============================================================================
+// 기본 위치 (서울 시청) - 컴포넌트 밖으로 이동하여 불필요한 재선언 방지
+const defaultPosition = {
+  lat: 37.5665,
+  lng: 126.978,
+};
 
 // =============================================================================
 // 🎨 스타일 컴포넌트
@@ -56,18 +67,9 @@ interface KakaoMapProps {
 /**
  * 지도 컨테이너 스타일
  */
-const MapContainer = styled.div<{ width?: string; height?: string }>`
-  width: ${props => props.width || '100%'};
-  height: ${props => props.height || '400px'};
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  
-  /* 반응형 디자인 */
-  @media (max-width: 768px) {
-    height: 300px;
-    border-radius: 4px;
-  }
+const MapContainer = styled.div`
+  width: 100%;
+  height: 100%;
 `;
 
 /**
@@ -79,39 +81,7 @@ const LoadingSpinner = styled.div`
   align-items: center;
   height: 100%;
   font-size: 16px;
-  color: #666;
-  background-color: #f5f5f5;
-  
-  &::before {
-    content: '🔄';
-    animation: spin 1s linear infinite;
-    margin-right: 8px;
-  }
-  
-  @keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-  }
-`;
-
-/**
- * 에러 메시지 스타일
- */
-const ErrorMessage = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-  font-size: 16px;
-  color: #e74c3c;
-  background-color: #fdf2f2;
-  border: 1px solid #e74c3c;
-  border-radius: 4px;
-  
-  &::before {
-    content: '⚠️';
-    margin-right: 8px;
-  }
+  color: #555;
 `;
 
 // =============================================================================
@@ -119,250 +89,90 @@ const ErrorMessage = styled.div`
 // =============================================================================
 
 const KakaoMap: React.FC<KakaoMapProps> = ({
-  center,
-  level = 3,
-  markers = [],
-  onMarkerClick,
-  onMapClick,
+  searchLocation,
+  shelters,
   style
 }) => {
-  // DOM 요소 참조
   const mapContainer = useRef<HTMLDivElement>(null);
-  
-  // 상태 관리
   const [map, setMap] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [kakaoMarkers, setKakaoMarkers] = useState<any[]>([]);
+  const [currentMarkers, setCurrentMarkers] = useState<any[]>([]);
 
-  // =============================================================================
-  // 🚀 초기화 함수들
-  // =============================================================================
-
-  /**
-   * 카카오 맵 초기화 함수
-   */
-  const initializeMap = () => {
-    console.log('🚀 지도 초기화 시작...');
-    console.log('window.kakao:', window.kakao);
-    console.log('window.kakao.maps:', window.kakao?.maps);
-    
-    // 카카오 맵 API가 로드되었는지 확인
-    if (!window.kakao || !window.kakao.maps) {
-      console.error('❌ 카카오 맵 API가 로드되지 않았습니다.');
-      setError('카카오 맵 API가 로드되지 않았습니다. 인터넷 연결을 확인해주세요.');
-      setIsLoading(false);
-      return;
-    }
-
-    if (!mapContainer.current) {
-      setError('지도 컨테이너를 찾을 수 없습니다.');
-      setIsLoading(false);
-      return;
-    }
-
-    try {
-      // 지도 옵션 설정
-      const options = {
-        center: new window.kakao.maps.LatLng(center.lat, center.lng),
-        level: level
+  // 지도 초기화
+  useEffect(() => {
+    if (window.kakao && window.kakao.maps) {
+      initializeMap();
+    } else {
+      const script = document.createElement('script');
+      script.async = true;
+      script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${process.env.REACT_APP_KAKAO_MAP_API_KEY}&autoload=false&libraries=services`;
+      document.head.appendChild(script);
+      script.onload = () => {
+        window.kakao.maps.load(initializeMap);
       };
-
-      // 지도 생성
-      const kakaoMap = new window.kakao.maps.Map(mapContainer.current, options);
-      
-      // 지도 클릭 이벤트 등록
-      if (onMapClick) {
-        window.kakao.maps.event.addListener(kakaoMap, 'click', (mouseEvent: any) => {
-          const latlng = mouseEvent.latLng;
-          onMapClick({
-            lat: latlng.getLat(),
-            lng: latlng.getLng()
-          });
-        });
-      }
-
-      setMap(kakaoMap);
-      setIsLoading(false);
-      
-      console.log('✅ 카카오 맵이 성공적으로 초기화되었습니다.');
-    } catch (err: any) {
-      console.error('❌ 카카오 맵 초기화 실패:', err);
-      setError(`지도 초기화에 실패했습니다: ${err.message}`);
-      setIsLoading(false);
     }
-  };
+  }, []);
 
-  /**
-   * 마커들을 지도에 추가하는 함수
-   */
-  const addMarkersToMap = () => {
-    if (!map || !markers.length) return;
-
-    // 기존 마커들 제거
-    kakaoMarkers.forEach(marker => marker.setMap(null));
-
-    // 새 마커들 생성
-    const newMarkers = markers.map((markerData, index) => {
-      try {
-        // 마커 위치 설정
-        const position = new window.kakao.maps.LatLng(
-          markerData.position.lat, 
-          markerData.position.lng
-        );
-
-        // 마커 생성
-        const marker = new window.kakao.maps.Marker({
-          position: position,
-          title: markerData.title
-        });
-
-        // 마커를 지도에 표시
-        marker.setMap(map);
-
-        // 마커 클릭 이벤트 등록
-        if (onMarkerClick) {
-          window.kakao.maps.event.addListener(marker, 'click', () => {
-            onMarkerClick(markerData);
-          });
-        }
-
-        // 인포윈도우 생성 (선택사항)
-        if (markerData.content) {
-          const infoWindow = new window.kakao.maps.InfoWindow({
-            content: `<div style="padding:10px;">${markerData.content}</div>`
-          });
-
-          // 마커 클릭 시 인포윈도우 표시
-          window.kakao.maps.event.addListener(marker, 'click', () => {
-            infoWindow.open(map, marker);
-          });
-        }
-
-        return marker;
-      } catch (err: any) {
-        console.error(`❌ 마커 ${index} 생성 실패:`, err);
-        return null;
-      }
-    }).filter(marker => marker !== null);
-
-    setKakaoMarkers(newMarkers);
-    console.log(`✅ ${newMarkers.length}개의 마커가 추가되었습니다.`);
-  };
-
-  // =============================================================================
-  // 🎣 이펙트 훅들
-  // =============================================================================
-
-  /**
-   * 환경변수 확인 함수
-   */
-  const checkEnvironmentVariables = () => {
-    const apiKey = process.env.REACT_APP_KAKAO_MAP_API_KEY;
-    
-    console.log('🔑 환경변수 확인...');
-    console.log('API 키 존재 여부:', !!apiKey);
-    console.log('API 키 앞 4자리:', apiKey ? apiKey.substring(0, 4) + '...' : 'undefined');
-    
-    if (!apiKey) {
-      console.error('❌ REACT_APP_KAKAO_MAP_API_KEY 환경변수가 설정되지 않았습니다.');
-      setError('카카오 맵 API 키가 설정되지 않았습니다. ENV_SETUP.md를 참고하여 frontend/.env 파일을 생성해주세요.');
-      setIsLoading(false);
-      return false;
-    }
-    
-    console.log('✅ 환경변수 확인 완료');
-    return true;
-  };
-
-  /**
-   * 컴포넌트 마운트 시 지도 초기화
-   */
-  useEffect(() => {
-    // 1. 먼저 환경변수 확인
-    if (!checkEnvironmentVariables()) {
-      return;
-    }
-
-    let checkCount = 0;
-    const maxChecks = 50; // 5초까지 기다림 (100ms * 50)
-    
-    // 2. 카카오 맵 API 로드 대기
-    const checkKakaoMaps = () => {
-      console.log(`🔍 카카오 API 확인 중... (${checkCount + 1}/${maxChecks})`);
-      console.log('window.kakao 존재:', !!window.kakao);
-      console.log('window.kakao.maps 존재:', !!(window.kakao && window.kakao.maps));
-      
-      if (window.kakao && window.kakao.maps) {
-        console.log('✅ 카카오 API 로드 완료!');
-        initializeMap();
-      } else {
-        checkCount++;
-        if (checkCount < maxChecks) {
-          setTimeout(checkKakaoMaps, 100);
-        } else {
-          console.error('❌ 카카오 API 로드 타임아웃');
-          setError('카카오 맵 API 로드에 실패했습니다. 페이지를 새로고침해주세요.');
-          setIsLoading(false);
-        }
-      }
+  const initializeMap = () => {
+    const options = {
+      center: new window.kakao.maps.LatLng(37.456257, 126.705208), // 인천시청
+      level: 8,
     };
+    const kakaoMap = new window.kakao.maps.Map(mapContainer.current, options);
+    setMap(kakaoMap);
+    setIsLoading(false);
+  };
 
-    checkKakaoMaps();
-    
-    // 컴포넌트 언마운트 시 정리
-    return () => {
-      kakaoMarkers.forEach(marker => marker.setMap(null));
-    };
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  /**
-   * 중심 좌표가 변경될 때 지도 이동
-   */
+  // 지도 중심 및 마커 업데이트
   useEffect(() => {
-    if (map && center) {
-      const moveLatLng = new window.kakao.maps.LatLng(center.lat, center.lng);
-      map.setCenter(moveLatLng);
+    if (!map) return;
+
+    // 이전 마커 모두 제거
+    currentMarkers.forEach(marker => marker.setMap(null));
+    const newMarkers: any[] = [];
+
+    const centerPosition = searchLocation
+      ? new window.kakao.maps.LatLng(searchLocation.lat, searchLocation.lng)
+      : new window.kakao.maps.LatLng(defaultPosition.lat, defaultPosition.lng);
+
+    map.setCenter(centerPosition);
+    map.setLevel(searchLocation ? 5 : 8, { animate: true });
+
+    // 검색 위치 마커 추가
+    if (searchLocation) {
+      const searchMarkerImage = new window.kakao.maps.MarkerImage(
+        'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png',
+        new window.kakao.maps.Size(24, 35),
+        { offset: new window.kakao.maps.Point(12, 35) }
+      );
+
+      const searchMarker = new window.kakao.maps.Marker({
+        map: map,
+        position: centerPosition,
+        title: searchLocation.name,
+        image: searchMarkerImage,
+      });
+      newMarkers.push(searchMarker);
     }
-  }, [map, center]);
 
-  /**
-   * 마커가 변경될 때 지도 업데이트
-   */
-  useEffect(() => {
-    addMarkersToMap();
-  }, [map, markers]); // eslint-disable-line react-hooks/exhaustive-deps
+    // 대피소 마커 추가
+    shelters.forEach(shelter => {
+      const shelterMarker = new window.kakao.maps.Marker({
+        map: map,
+        position: new window.kakao.maps.LatLng(shelter.lat, shelter.lng),
+        title: shelter.name,
+      });
+      newMarkers.push(shelterMarker);
+    });
 
-  // =============================================================================
-  // 🎨 렌더링
-  // =============================================================================
+    setCurrentMarkers(newMarkers);
+  }, [map, searchLocation, shelters, currentMarkers]);
 
   return (
-    <MapContainer style={style}>
-      {/* 로딩 상태 */}
-      {isLoading && (
-        <LoadingSpinner>
-          지도를 불러오는 중...
-        </LoadingSpinner>
-      )}
-      
-      {/* 에러 상태 */}
-      {error && (
-        <ErrorMessage>
-          {error}
-        </ErrorMessage>
-      )}
-      
-      {/* 지도 컨테이너 */}
-      <div 
-        ref={mapContainer} 
-        style={{ 
-          width: '100%', 
-          height: '100%',
-          display: isLoading || error ? 'none' : 'block'
-        }}
-      />
-    </MapContainer>
+    <>
+      {isLoading && <LoadingSpinner>🗺️ 지도 로딩 중...</LoadingSpinner>}
+      <MapContainer ref={mapContainer} style={style} />
+    </>
   );
 };
 

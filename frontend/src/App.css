@@ -29,7 +29,7 @@ body {
   padding: 30px;
   display: flex;
   flex-direction: column;
-  overflow-y: auto; /* 내용이 길어지면 스크롤 */
+  gap: 20px; /* 검색창과 지도 사이 간격 추가 */
 }
 
 /* 오른쪽 컬럼 (대피소 목록) */
@@ -45,6 +45,11 @@ body {
   font-size: 24px;
   margin-bottom: 20px;
   color: #333;
+}
+
+.map-wrapper { /* .map-container -> .map-wrapper 로 변경 및 수정 */
+  flex: 1; /* 남은 모든 공간을 차지하도록 설정 */
+  min-height: 0; /* flex-shrink 이슈 방지 */
 }
 
 .App {

@@ -1,19 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-
-// =============================================================================
-// 📝 타입 정의
-// =============================================================================
-
-interface Shelter {
-  id: number;
-  name: string;
-  type: string;
-  capacity: number;
-  area: number;
-  hasBathroom: boolean;
-  riskLevel: 'safe' | 'caution' | 'danger';
-}
+import { Shelter } from '../data/shelters';
 
 // =============================================================================
 // 🎨 스타일 컴포넌트
@@ -93,47 +80,23 @@ const OptionsButton = styled.button`
 // 📍 메인 컴포넌트
 // =============================================================================
 
-const ShelterList: React.FC = () => {
-  const mockShelters: Shelter[] = [
-    {
-      id: 1,
-      name: '내손동 성결아파트',
-      type: '지하 1층 주차장 (공공시설)',
-      capacity: 9100,
-      area: 5120,
-      hasBathroom: true,
-      riskLevel: 'danger',
-    },
-    {
-      id: 2,
-      name: '내손동 e편한세상아파트',
-      type: '지하 1층 주차장 (공공시설)',
-      capacity: 8912,
-      area: 8912,
-      hasBathroom: true,
-      riskLevel: 'safe',
-    },
-    {
-      id: 3,
-      name: '반도보라빌리지 1단지',
-      type: '지하 1층 주차장 (공공시설)',
-      capacity: 12058,
-      area: 13038,
-      hasBathroom: false,
-      riskLevel: 'caution',
-    },
-  ];
+interface ShelterListProps {
+  shelters: Shelter[];
+}
+
+const ShelterList: React.FC<ShelterListProps> = ({ shelters }) => {
+  if (shelters.length === 0) {
+    return <InfoLine>검색 위치 10km 이내에 대피소가 없습니다.</InfoLine>;
+  }
 
   return (
     <ListContainer>
-      {mockShelters.map((shelter) => (
-        <ListItem key={shelter.id}>
-          <RiskCircle level={shelter.riskLevel} />
+      {shelters.map((shelter, index) => (
+        <ListItem key={index}>
+          <RiskCircle level={shelter.safety} />
           <ShelterInfo>
             <ShelterName>{shelter.name}</ShelterName>
-            <InfoLine>📍 {shelter.type}</InfoLine>
-            <InfoLine>👥 {shelter.area}㎡ | {shelter.capacity}명 수용</InfoLine>
-            <InfoLine>🚻 이동화장실: {shelter.hasBathroom ? '있음' : '없음'}</InfoLine>
+            <InfoLine>📍 {shelter.address}</InfoLine>
           </ShelterInfo>
           <OptionsButton>⋮</OptionsButton>
         </ListItem>

@@ -13,28 +13,11 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
+import { SearchResult } from '../types'; // 공통 타입 가져오기
 
 // =============================================================================
 // 📝 타입 정의
 // =============================================================================
-
-/**
- * 좌표 정보 인터페이스
- */
-interface Coordinates {
-  lat: number; // 위도
-  lng: number; // 경도
-}
-
-/**
- * 검색 결과 인터페이스
- */
-interface SearchResult {
-  name: string;              // 장소명
-  address: string;           // 주소
-  coordinates: Coordinates;  // 좌표
-  category?: string;         // 카테고리 (예: 음식점, 카페 등)
-}
 
 /**
  * 키워드 검색 컴포넌트 Props
@@ -190,12 +173,12 @@ const SuggestionList = styled.ul`
 /**
  * 자동완성 항목 스타일
  */
-const SuggestionItem = styled.li<{ isHighlighted?: boolean }>`
+const SuggestionItem = styled.li<{ $isHighlighted?: boolean }>`
   padding: 12px 16px;
   cursor: pointer;
   border-bottom: 1px solid #f0f0f0;
   transition: background-color 0.2s ease;
-  background-color: ${props => props.isHighlighted ? '#f8f9fa' : 'white'};
+  background-color: ${props => props.$isHighlighted ? '#f8f9fa' : 'white'};
   
   &:hover {
     background-color: #f0f7ff;
@@ -504,7 +487,7 @@ const AddressSearch: React.FC<AddressSearchProps> = ({
           {suggestions.map((suggestion, index) => (
             <SuggestionItem
               key={index}
-              isHighlighted={index === highlightedIndex}
+              $isHighlighted={index === highlightedIndex}
               onClick={() => handleSelectAddress(suggestion)}
             >
               <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>
