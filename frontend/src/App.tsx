@@ -10,6 +10,7 @@ import styled from 'styled-components';
 import KakaoMap from './components/KakaoMap';
 import AddressSearch from './components/AddressSearch';
 import Header from './components/Header';
+import ShelterList from './components/ShelterList';
 import './App.css';
 
 // =============================================================================
@@ -113,6 +114,17 @@ const ApiStatusBox = styled.div`
 const MapSection = styled.div`
   width: 100%;
   margin-top: 30px;
+`;
+
+const RightColumnHeader = styled.h2`
+  font-size: 22px;
+  margin-bottom: 20px;
+  text-align: center;
+  background-color: #e7f5ff; /* 부드러운 하늘색 배경 */
+  color: #1c7ed6; /* 차분한 파란색 텍스트 */
+  padding: 10px;
+  border-radius: 8px;
+  font-weight: 700;
 `;
 
 // =============================================================================
@@ -287,9 +299,8 @@ const App: React.FC = () => {
           </MapSection>
         </div>
         <div className="right-column">
-          {/* 오른쪽 컬럼: 대피소 목록 (추후 구현) */}
-          <h2>가장 가까운 대피소</h2>
-          <p>이곳에 대피소 목록이 표시됩니다.</p>
+          <RightColumnHeader>가장 가까운 대피소</RightColumnHeader>
+          <ShelterList />
         </div>
       </div>
     </div>
