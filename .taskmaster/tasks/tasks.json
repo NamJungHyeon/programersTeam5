@@ -357,7 +357,7 @@
         "id": 1,
         "title": "프로젝트 초기 설정 및 저장소 구성",
         "description": "프론트엔드(TypeScript, React) 프로젝트 구조 설정 및 Git 저장소 초기화, 백엔드 설정은 추후 진행",
-        "status": "in-progress",
+        "status": "done",
         "dependencies": [],
         "priority": "high",
         "details": "1. 프론트엔드 설정 (우선 진행):\n   - Create React App with TypeScript 템플릿 사용\n   - 필요한 패키지 설치: axios, styled-components, kakao-maps-sdk\n   - ESLint 및 Prettier 설정\n   - 모듈화된 폴더 구조 생성:\n     * components: 재사용 가능한 UI 컴포넌트\n     * services: API 호출 및 데이터 처리 로직\n     * utils: 유틸리티 함수\n     * types: TypeScript 타입 정의\n     * hooks: 커스텀 React 훅\n     * contexts: 전역 상태 관리\n   - 카카오 맵 API 연동을 위한 기본 구조 설정\n   - 초보자를 위한 명확한 주석 및 일관된 코드 스타일 적용\n\n2. Git 저장소 설정:\n   - .gitignore 파일 생성 (node_modules, build 폴더 등 제외)\n   - README.md 작성 (프로젝트 설명, 설치 방법, 실행 방법, 폴더 구조 설명 등)\n   - 초기 커밋\n\n3. 백엔드 설정 (추후 진행):\n   - Spring Boot 프로젝트 설정은 프론트엔드 개발 진행 후 별도 작업으로 연기",
@@ -367,7 +367,7 @@
             "id": 1,
             "title": "React + TypeScript 프로젝트 초기화",
             "description": "Create React App을 사용하여 TypeScript 기반 프로젝트 생성",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "details": "<info added on 2025-07-01T08:15:56.848Z>\n✅ **React + TypeScript 프로젝트 초기화 완료**\n\n**완료된 작업:**\n- React + TypeScript 프로젝트 생성 완료\n- 기본 패키지 설치 (axios, styled-components, @types/styled-components)\n- 모듈화된 폴더 구조 생성 (/types, /services, /utils, /hooks, /components, /contexts)\n\n**생성된 파일들:**\n- `/types/index.ts` - TypeScript 타입 정의 (Coordinates, Shelter, MapMarker 등)\n- `/utils/index.ts` - 유틸리티 함수들 (거리 계산, 포맷팅, 디바운스 등)\n- `/services/index.ts` - API 서비스 (대피소 검색, 주소 검색, 위치 서비스 등)\n- `/hooks/index.ts` - 커스텀 훅들 (useLocation, useShelters, useAddressSearch 등)\n\n**다음 단계:** 카카오 맵 기본 컴포넌트 생성 및 HTML에 script 태그 추가\n</info added on 2025-07-01T08:15:56.848Z>",
             "testStrategy": ""
@@ -376,7 +376,7 @@
             "id": 2,
             "title": "필요 패키지 설치 및 개발 환경 구성",
             "description": "axios, styled-components, kakao-maps-sdk 설치 및 ESLint/Prettier 설정",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "details": "",
             "testStrategy": ""
@@ -394,7 +394,7 @@
             "id": 4,
             "title": "카카오 맵 API 기본 연동 구조 설정",
             "description": "카카오 맵 API 키 설정 및 기본 지도 컴포넌트 구현",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "details": "",
             "testStrategy": ""
@@ -403,7 +403,7 @@
             "id": 5,
             "title": "코드 스타일 가이드 및 주석 규칙 수립",
             "description": "초보자도 이해하기 쉬운 주석 및 코드 스타일 가이드 작성",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "details": "",
             "testStrategy": ""
@@ -412,7 +412,7 @@
             "id": 6,
             "title": "Git 저장소 설정",
             "description": ".gitignore 생성, README.md 작성 및 초기 커밋",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "details": "",
             "testStrategy": ""
@@ -442,7 +442,7 @@
         "dependencies": [
           1
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": []
       },
       {
@@ -468,7 +468,7 @@
         "dependencies": [
           3
         ],
-        "status": "pending",
+        "status": "in-progress",
         "subtasks": []
       },
       {
@@ -578,7 +578,7 @@
     ],
     "metadata": {
       "created": "2025-07-01T08:01:08.699Z",
-      "updated": "2025-07-01T08:32:10.897Z",
+      "updated": "2025-07-03T07:38:43.468Z",
       "description": "프론트엔드 개발 작업 (TypeScript + React, 카카오 맵 API)"
     }
   }

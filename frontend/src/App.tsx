@@ -8,6 +8,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import KakaoMap from './components/KakaoMap';
+import AddressSearch from './components/AddressSearch';
 
 // =============================================================================
 // 🎨 스타일 컴포넌트
@@ -164,10 +165,20 @@ const App: React.FC = () => {
   /**
    * 지도 중심 좌표 (기본값: 서울시청)
    */
-  const [mapCenter] = useState({
+  const [mapCenter, setMapCenter] = useState({
     lat: 37.5665, // 서울시청 위도
     lng: 126.9780 // 서울시청 경도
   });
+
+  /**
+   * 검색된 장소 정보
+   */
+  const [searchResult, setSearchResult] = useState<{
+    name: string;
+    address: string;
+    coordinates: { lat: number; lng: number };
+    category?: string;
+  } | null>(null);
 
   /**
    * 임시 마커 데이터 (테스트용)
@@ -192,6 +203,23 @@ const App: React.FC = () => {
       content: '광화문광장 <br/>📍 종로구 세종로'
     }
   ]);
+
+  /**
+   * 모든 마커 데이터 (테스트 마커 + 검색 결과 마커)
+   */
+  const allMarkers = [
+    ...testMarkers,
+    // 검색 결과가 있으면 해당 위치에 특별한 마커 추가
+    ...(searchResult ? [{
+      id: 'search-result',
+      position: {
+        lat: searchResult.coordinates.lat,
+        lng: searchResult.coordinates.lng
+      },
+      title: '🔍 검색된 장소',
+      content: `${searchResult.name} <br/>🏷️ ${searchResult.category || '일반'} <br/>📍 ${searchResult.address}`
+    }] : [])
+  ];
 
   // =============================================================================
   // 🎯 이벤트 핸들러
@@ -233,6 +261,25 @@ const App: React.FC = () => {
   const handleMapClick = (coordinates: any) => {
     console.log('🗺️ 지도 클릭:', coordinates);
     // 여기에 주소 검색 로직을 추가할 수 있습니다
+  };
+
+  /**
+   * 키워드 검색 완료 이벤트 처리
+   */
+  const handleAddressSearch = (result: { name: string; address: string; coordinates: { lat: number; lng: number }; category?: string }) => {
+    console.log('🔍 키워드 검색 결과:', result);
+    
+    // 검색 결과 저장
+    setSearchResult(result);
+    
+    // 지도 중심을 검색된 위치로 이동
+    setMapCenter({
+      lat: result.coordinates.lat,
+      lng: result.coordinates.lng
+    });
+    
+    // 사용자에게 알림
+    alert(`📍 "${result.name}"로 지도가 이동되었습니다!`);
   };
 
   // =============================================================================
@@ -289,7 +336,45 @@ const App: React.FC = () => {
             </div>
           </ApiStatusBox>
           
-          <p>📍 사용법: 지도를 클릭하거나 마커를 클릭해보세요. 향후 주소 검색 기능이 추가될 예정입니다.</p>
+          {/* 키워드 검색 컴포넌트 */}
+          <AddressSearch
+            onSearch={handleAddressSearch}
+            placeholder="장소를 검색하세요 (예: 강남역, 스타벅스, 롯데월드)"
+            style={{ margin: '20px 0' }}
+          />
+          
+          {/* 검색 결과 표시 */}
+          {searchResult && (
+            <div style={{
+              background: '#e8f5e8',
+              border: '1px solid #c3e6c3',
+              borderRadius: '8px',
+              padding: '15px',
+              margin: '15px 0',
+              fontFamily: 'monospace',
+              fontSize: '14px'
+            }}>
+              <div style={{ fontWeight: 'bold', color: '#2d5a2d', marginBottom: '8px' }}>
+                🎯 검색된 장소:
+              </div>
+              <div style={{ color: '#1a1a1a', marginBottom: '4px' }}>
+                🏢 장소명: {searchResult.name}
+              </div>
+              {searchResult.category && (
+                <div style={{ color: '#1a1a1a', marginBottom: '4px' }}>
+                  🏷️ 카테고리: {searchResult.category}
+                </div>
+              )}
+              <div style={{ color: '#1a1a1a', marginBottom: '4px' }}>
+                📍 주소: {searchResult.address}
+              </div>
+              <div style={{ color: '#1a1a1a' }}>
+                🗺️ 좌표: {searchResult.coordinates.lat.toFixed(6)}, {searchResult.coordinates.lng.toFixed(6)}
+              </div>
+            </div>
+          )}
+          
+          <p>📍 사용법: 위에서 장소를 검색하거나, 지도를 클릭하거나 마커를 클릭해보세요.</p>
         </SearchSection>
 
         {/* 지도 섹션 */}
@@ -298,7 +383,7 @@ const App: React.FC = () => {
           <KakaoMap
             center={mapCenter}
             level={3}
-            markers={testMarkers}
+            markers={allMarkers}
             onMarkerClick={handleMarkerClick}
             onMapClick={handleMapClick}
             style={{
