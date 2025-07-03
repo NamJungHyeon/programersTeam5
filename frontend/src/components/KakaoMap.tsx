@@ -127,46 +127,57 @@ const KakaoMap: React.FC<KakaoMapProps> = ({
   useEffect(() => {
     if (!map) return;
 
-    // 이전 마커 모두 제거
+    // 1. 이전 마커 모두 제거
     currentMarkers.forEach(marker => marker.setMap(null));
     const newMarkers: any[] = [];
 
-    const centerPosition = searchLocation
-      ? new window.kakao.maps.LatLng(searchLocation.lat, searchLocation.lng)
-      : new window.kakao.maps.LatLng(defaultPosition.lat, defaultPosition.lng);
+    // 2. 새로운 마커 생성 및 화면 범위 계산 준비
+    const bounds = new window.kakao.maps.LatLngBounds();
+    let hasMarkers = false;
 
-    map.setCenter(centerPosition);
-    map.setLevel(searchLocation ? 5 : 8, { animate: true });
-
-    // 검색 위치 마커 추가
+    // 3. 검색 위치 마커 추가
     if (searchLocation) {
+      const pos = new window.kakao.maps.LatLng(searchLocation.lat, searchLocation.lng);
+
       const searchMarkerImage = new window.kakao.maps.MarkerImage(
         'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png',
-        new window.kakao.maps.Size(24, 35),
-        { offset: new window.kakao.maps.Point(12, 35) }
+        new window.kakao.maps.Size(24, 35)
       );
 
       const searchMarker = new window.kakao.maps.Marker({
         map: map,
-        position: centerPosition,
+        position: pos,
         title: searchLocation.name,
         image: searchMarkerImage,
       });
       newMarkers.push(searchMarker);
+      bounds.extend(pos); // 범위에 검색 위치 추가
+      hasMarkers = true;
     }
 
-    // 대피소 마커 추가
+    // 4. 대피소 마커 추가
     shelters.forEach(shelter => {
+      const pos = new window.kakao.maps.LatLng(shelter.lat, shelter.lng)
       const shelterMarker = new window.kakao.maps.Marker({
         map: map,
-        position: new window.kakao.maps.LatLng(shelter.lat, shelter.lng),
+        position: pos,
         title: shelter.name,
       });
       newMarkers.push(shelterMarker);
+      bounds.extend(pos); // 범위에 대피소 위치 추가
+      hasMarkers = true;
     });
 
+    // 5. 마커 상태 업데이트
     setCurrentMarkers(newMarkers);
-  }, [map, searchLocation, shelters, currentMarkers]);
+
+    // 6. 모든 마커가 보이도록 지도 범위 조정
+    // 검색을 했고, 표시할 마커가 하나라도 있는 경우에만 실행
+    if (searchLocation && hasMarkers) {
+      map.setBounds(bounds);
+    }
+
+  }, [map, searchLocation, shelters]);
 
   return (
     <>
