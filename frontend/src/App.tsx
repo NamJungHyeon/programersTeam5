@@ -9,6 +9,8 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import KakaoMap from './components/KakaoMap';
 import AddressSearch from './components/AddressSearch';
+import Header from './components/Header';
+import './App.css';
 
 // =============================================================================
 // 🎨 스타일 컴포넌트
@@ -34,30 +36,6 @@ const MainContent = styled.div`
   border-radius: 16px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   overflow: hidden;
-`;
-
-/**
- * 헤더 영역
- */
-const Header = styled.header`
-  background: linear-gradient(135deg, #4a90e2 0%, #50c8a3 100%);
-  color: white;
-  padding: 30px;
-  text-align: center;
-  
-  h1 {
-    margin: 0 0 10px 0;
-    font-size: 2.5rem;
-    font-weight: 700;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-  }
-  
-  p {
-    margin: 0;
-    font-size: 1.1rem;
-    opacity: 0.9;
-    font-weight: 300;
-  }
 `;
 
 /**
@@ -132,14 +110,9 @@ const ApiStatusBox = styled.div`
 /**
  * 지도 섹션
  */
-const MapSection = styled.section`
-  padding: 30px;
-  
-  h3 {
-    color: #333;
-    font-size: 1.3rem;
-    margin: 0 0 20px 0;
-  }
+const MapSection = styled.div`
+  width: 100%;
+  margin-top: 30px;
 `;
 
 // =============================================================================
@@ -287,114 +260,39 @@ const App: React.FC = () => {
   // =============================================================================
 
   return (
-    <AppContainer>
-      <MainContent>
-        {/* 헤더 */}
-        <Header>
-          <h1>SafetyFirst</h1>
-          <p>가장 가까운 대피소를 빠르게 찾아보세요</p>
-        </Header>
-
-        {/* 검색 섹션 */}
-        <SearchSection>
-          <h2>🗺️ 지도에서 대피소 찾기</h2>
-          
-          {/* 카카오 API 설정 안내 */}
-          <WarningBox>
-            <strong>⚠️ 지도가 표시되지 않는 경우:</strong>
-            <ul>
-              <li><strong>1단계:</strong> <code>frontend/.env</code> 파일이 생성되었는지 확인 (ENV_SETUP.md 참고)</li>
-              <li><strong>2단계:</strong> 카카오 개발자 콘솔에서 <strong>도메인 설정</strong> 확인</li>
-              <li>Web 플랫폼에 다음 도메인들을 추가해주세요:</li>
-              <li>• <code>http://localhost:3000</code></li>
-              <li>• <code>http://127.0.0.1:3000</code></li>
-              <li>F12 개발자 도구의 Console 탭에서 자세한 에러를 확인해주세요</li>
-            </ul>
-          </WarningBox>
-          
-          {/* API 상태 정보 */}
-          <ApiStatusBox>
-            <div className="status-item">
-              <span className="label">현재 URL:</span>
-              <span className="value">{apiStatus.currentUrl}</span>
-            </div>
-            <div className="status-item">
-              <span className="label">환경변수 API 키:</span>
-              <span className="value">{apiStatus.hasApiKey ? '✅ 설정됨' : '❌ 미설정'}</span>
-            </div>
-            <div className="status-item">
-              <span className="label">window.kakao 존재:</span>
-              <span className="value">{apiStatus.kakaoExists ? '✅ 있음' : '❌ 없음'}</span>
-            </div>
-            <div className="status-item">
-              <span className="label">window.kakao.maps 존재:</span>
-              <span className="value">{apiStatus.kakaoMapsExists ? '✅ 있음' : '❌ 없음'}</span>
-            </div>
-            <div className="status-item">
-              <span className="label">마지막 확인:</span>
-              <span className="value">{apiStatus.timestamp}</span>
-            </div>
-          </ApiStatusBox>
-          
-          {/* 키워드 검색 컴포넌트 */}
-          <AddressSearch
-            onSearch={handleAddressSearch}
-            placeholder="장소를 검색하세요 (예: 강남역, 스타벅스, 롯데월드)"
-            style={{ margin: '20px 0' }}
-          />
-          
-          {/* 검색 결과 표시 */}
-          {searchResult && (
-            <div style={{
-              background: '#e8f5e8',
-              border: '1px solid #c3e6c3',
-              borderRadius: '8px',
-              padding: '15px',
-              margin: '15px 0',
-              fontFamily: 'monospace',
-              fontSize: '14px'
-            }}>
-              <div style={{ fontWeight: 'bold', color: '#2d5a2d', marginBottom: '8px' }}>
-                🎯 검색된 장소:
-              </div>
-              <div style={{ color: '#1a1a1a', marginBottom: '4px' }}>
-                🏢 장소명: {searchResult.name}
-              </div>
-              {searchResult.category && (
-                <div style={{ color: '#1a1a1a', marginBottom: '4px' }}>
-                  🏷️ 카테고리: {searchResult.category}
-                </div>
-              )}
-              <div style={{ color: '#1a1a1a', marginBottom: '4px' }}>
-                📍 주소: {searchResult.address}
-              </div>
-              <div style={{ color: '#1a1a1a' }}>
-                🗺️ 좌표: {searchResult.coordinates.lat.toFixed(6)}, {searchResult.coordinates.lng.toFixed(6)}
-              </div>
-            </div>
-          )}
-          
-          <p>📍 사용법: 위에서 장소를 검색하거나, 지도를 클릭하거나 마커를 클릭해보세요.</p>
-        </SearchSection>
-
-        {/* 지도 섹션 */}
-        <MapSection>
-          <h3>📍 서울 주요 지역 지도</h3>
-          <KakaoMap
-            center={mapCenter}
-            level={3}
-            markers={allMarkers}
-            onMarkerClick={handleMarkerClick}
-            onMapClick={handleMapClick}
-            style={{
-              width: '100%',
-              height: '500px',
-              borderRadius: '8px'
-            }}
-          />
-        </MapSection>
-      </MainContent>
-    </AppContainer>
+    <div className="app-wrapper">
+      <Header />
+      <div className="main-container">
+        <div className="left-column">
+          <div className="search-container">
+            <h2>🗺️ 검색할 지역 이름</h2>
+            <AddressSearch
+              onSearch={handleAddressSearch}
+              placeholder="장소를 검색하세요 (예: 강남역, 스타벅스, 롯데월드)"
+            />
+          </div>
+          <MapSection>
+            <KakaoMap
+              center={mapCenter}
+              level={3}
+              markers={allMarkers}
+              onMarkerClick={handleMarkerClick}
+              onMapClick={handleMapClick}
+              style={{
+                width: '100%',
+                height: 'calc(100vh - 250px)', // 높이 계산 조정
+                borderRadius: '8px'
+              }}
+            />
+          </MapSection>
+        </div>
+        <div className="right-column">
+          {/* 오른쪽 컬럼: 대피소 목록 (추후 구현) */}
+          <h2>가장 가까운 대피소</h2>
+          <p>이곳에 대피소 목록이 표시됩니다.</p>
+        </div>
+      </div>
+    </div>
   );
 };
 
