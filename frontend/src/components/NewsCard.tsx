@@ -1,14 +1,23 @@
-import React from "react";
+import React, { useState } from "react";
 
 type NewsCardProps = {
   title: string;
   description: string;
   image: string;
+  onClick?: () => void; // 클릭 이벤트
 };
 
-const NewsCard: React.FC<NewsCardProps> = ({ title, description, image }) => {
+const NewsCard: React.FC<NewsCardProps> = ({
+  title,
+  description,
+  image,
+  onClick,
+}) => {
+  const [hovered, setHovered] = useState(false);
+
   return (
     <div
+      onClick={onClick}
       style={{
         width: "250px",
         margin: "0.5rem",
@@ -18,8 +27,15 @@ const NewsCard: React.FC<NewsCardProps> = ({ title, description, image }) => {
         backgroundColor: "#fff",
         display: "flex",
         flexDirection: "column",
+        cursor: "pointer",
+        transition: "transform 0.18s cubic-bezier(.4,1.3,.4,1)",
+        transform: hovered ? "scale(1.05)" : "scale(1)",
+        willChange: "transform",
       }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
     >
+      {/* 이미지 영역 */}
       <div style={{ width: "100%", height: "150px", overflow: "hidden" }}>
         <img
           src={image}

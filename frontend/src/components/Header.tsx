@@ -14,8 +14,8 @@ const Header: React.FC = () => {
       }}
     >
       <div style={{ display: "flex", alignItems: "center" }}>
-        <a
-          href="/"
+        <Link
+          to="/"
           style={{
             textDecoration: "none",
             color: "black",
@@ -26,29 +26,49 @@ const Header: React.FC = () => {
           <img
             src={logo}
             alt="SafetyFirst"
-            style={{ height: "40px", marginRight: "0.5rem" }}
+            style={{ height: "28px", marginRight: "0.5rem" }}
           />
-          <span style={{ fontSize: "1.5rem", fontWeight: "bold" }}>
+          <span style={{ fontSize: "1.3rem", fontWeight: "bold" }}>
             SafetyFirst
           </span>
-        </a>
+        </Link>
       </div>
 
-      <nav>
-        <a href="/shelter" style={{ margin: "0 1rem" }}>
+      <nav style={{ display: "flex", alignItems: "center" }}>
+        <Link
+          to="/shelter"
+          style={{
+            margin: "0 1rem",
+            color: "#222",
+            textDecoration: "none",
+            fontWeight: "normal",   // 게시판이랑 동일
+          }}
+        >
           대피소 찾기
-        </a>
-
-        <Link to="/board" style={{ margin: "0 1rem" }}>
+        </Link>
+        <Link
+          to="/board"
+          style={{
+            margin: "0 1rem",
+            color: "#222",
+            textDecoration: "none",
+            fontWeight: "normal",
+          }}
+        >
           게시판
         </Link>
         <Link
           to="/login"
           style={{
-            margin: "0 1rem",
+            marginLeft: "1rem",
             backgroundColor: "#e9ecef",
-            padding: "0.25rem 0.75rem",
-            borderRadius: "4px",
+            color: "#222",
+            padding: "0.25rem 1.3rem",
+            borderRadius: "8px",
+            fontWeight: "bold",
+            boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
+            textDecoration: "none",
+            transition: "background 0.2s",
           }}
         >
           로그인

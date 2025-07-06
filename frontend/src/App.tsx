@@ -4,6 +4,7 @@ import HomePage from "./pages/HomePage";
 import ShelterPage from "./pages/ShelterPage"; // 대피소 페이지
 import BoardPage from "./pages/BoardPage";
 import LoginPage from "./pages/LoginPage";
+import RiskPage from "./pages/RiskPage";
 
 const App: React.FC = () => {
   return (
@@ -13,6 +14,7 @@ const App: React.FC = () => {
         <Route path="/shelter" element={<ShelterPage />} />
         <Route path="/board" element={<BoardPage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/risk" element={<RiskPage />} />
       </Routes>
     </Router>
   );
