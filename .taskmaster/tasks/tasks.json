@@ -198,7 +198,7 @@
         "dependencies": [
           1
         ],
-        "status": "pending",
+        "status": "in-progress",
         "subtasks": []
       },
       {
@@ -347,7 +347,7 @@
     ],
     "metadata": {
       "created": "2025-07-01T07:59:04.207Z",
-      "updated": "2025-07-01T07:59:04.207Z",
+      "updated": "2025-07-07T08:22:50.195Z",
       "description": "백엔드 개발 작업 (Spring Boot + MySQL, API 개발)"
     }
   },
