@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Header from "../components/Header";  // 헤더 추가!
+import Header from "../components/Header";
 
 const cities = ["서울", "경기도", "부산", "인천", "대구"];
 
@@ -26,33 +26,68 @@ const getColor = (status: string) => {
 
 const RiskPage: React.FC = () => {
   const [selected, setSelected] = useState("경기도");
+  const [hoveredIdx, setHoveredIdx] = useState<number | null>(null); // 추가!
 
   return (
     <div>
       <Header />
-      <div style={{ display: "flex", flexDirection: "row", gap: "2rem", margin: "2rem" }}>
-        {/* 지도 영역 */}
-        <div style={{
-          flex: 2,
-          minWidth: 400,
-          background: "#dde3e7",
-          borderRadius: "20px",
+
+      <div
+        style={{
           display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          height: 420,
-          position: "relative" // position 추가!
-        }}>
-          {/* 지도 더미 */}
-          <span role="img" aria-label="지도" style={{ fontSize: "7rem" }}>🗺️</span>
-          <div style={{
-            position: "absolute", left: 80, top: 110, background: "#fff", borderRadius: 24, padding: "0.5rem 1.2rem",
-            boxShadow: "0 2px 12px rgba(0,0,0,0.13)", fontWeight: 600, fontSize: "1rem"
-          }}>{selected}</div>
+          flexDirection: "row",
+          gap: "2rem",
+          margin: "2rem",
+        }}
+      >
+        {/* 지도 영역 */}
+        <div
+          style={{
+            flex: 2,
+            minWidth: 400,
+            background: "#dde3e7",
+            borderRadius: "20px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            height: 540,
+            position: "relative",
+          }}
+        >
+          <span
+            role="img"
+            aria-label="지도"
+            style={{ fontSize: "7rem" }}
+          >
+            🗺️
+          </span>
+          <div
+            style={{
+              position: "absolute",
+              left: 80,
+              top: 110,
+              background: "#fff",
+              borderRadius: 24,
+              padding: "0.5rem 1.2rem",
+              boxShadow: "0 2px 12px rgba(0,0,0,0.13)",
+              fontWeight: 600,
+              fontSize: "1rem",
+            }}
+          >
+            {selected}
+          </div>
         </div>
 
         {/* 오른쪽 컨트롤 */}
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "1.2rem" }}>
+        <div
+          style={{
+            flex: 1,
+            display: "flex",
+            flexDirection: "column",
+            gap: "1.2rem",
+          }}
+        >
+          {/* 검색 */}
           <div style={{ marginBottom: "0.5rem" }}>
             <input
               placeholder="검색할 지역 이름"
@@ -66,10 +101,14 @@ const RiskPage: React.FC = () => {
               }}
             />
           </div>
-          {/* 위험도 카테고리 */}
+
+          {/* 위험도 카테고리 (마우스 오버 애니메이션 적용) */}
           <div style={{ display: "flex", gap: "0.7rem", marginBottom: "0.8rem" }}>
-            {dummyRisk.map((r) => (
-              <div key={r.type}
+            {dummyRisk.map((r, idx) => (
+              <div
+                key={r.type}
+                onMouseEnter={() => setHoveredIdx(idx)}
+                onMouseLeave={() => setHoveredIdx(null)}
                 style={{
                   border: `2px solid ${getColor(r.status)}`,
                   borderRadius: "14px",
@@ -78,25 +117,49 @@ const RiskPage: React.FC = () => {
                   flexDirection: "column",
                   alignItems: "center",
                   minWidth: 70,
-                  background: "#fff"
-                }}>
+                  background: "#fff",
+                  cursor: "pointer",
+                  transition: "transform 0.18s cubic-bezier(.4,1.3,.4,1)",
+                  transform: hoveredIdx === idx ? "scale(1.18)" : "scale(1)",
+                  boxShadow: hoveredIdx === idx
+                    ? "0 4px 12px rgba(0,0,0,0.12)"
+                    : "0 2px 6px rgba(0,0,0,0.08)",
+                  zIndex: hoveredIdx === idx ? 2 : 1,
+                }}
+              >
                 <span style={{ fontSize: "1.3rem" }}>{r.icon}</span>
                 <span style={{ fontSize: "0.9rem", margin: "0.1rem 0" }}>{r.type}</span>
-                <span style={{
-                  background: getColor(r.status),
-                  color: "#fff", borderRadius: 7, fontSize: "0.8rem", padding: "0.07rem 0.7rem"
-                }}>{r.status}</span>
+                <span
+                  style={{
+                    background: getColor(r.status),
+                    color: "#fff",
+                    borderRadius: 7,
+                    fontSize: "0.8rem",
+                    padding: "0.07rem 0.7rem",
+                  }}
+                >
+                  {r.status}
+                </span>
               </div>
             ))}
           </div>
-          {/* 지역 선택 (리스트) */}
-          <div style={{
-            background: "#fff",
-            borderRadius: 18,
-            padding: "1rem",
-            boxShadow: "0 2px 8px #eee"
-          }}>
-            <div style={{ marginBottom: "0.7rem", fontWeight: 600, fontSize: "1.07rem" }}>
+
+          {/* 지역 선택 리스트 */}
+          <div
+            style={{
+              background: "#fff",
+              borderRadius: 18,
+              padding: "1rem",
+              boxShadow: "0 2px 8px #eee",
+            }}
+          >
+            <div
+              style={{
+                marginBottom: "0.7rem",
+                fontWeight: 600,
+                fontSize: "1.07rem",
+              }}
+            >
               선택 지역 : <b>{selected}</b>
             </div>
             {cities.map((c) => (
@@ -115,8 +178,12 @@ const RiskPage: React.FC = () => {
                   marginBottom: "0.6rem",
                   cursor: "pointer",
                   fontWeight: selected === c ? 700 : 400,
-                }}>
-                <span role="img" aria-label="지역" style={{ marginRight: "0.5rem" }}>🏠</span> {c}
+                }}
+              >
+                <span role="img" aria-label="지역" style={{ marginRight: "0.5rem" }}>
+                  🏠
+                </span>
+                {c}
               </button>
             ))}
           </div>

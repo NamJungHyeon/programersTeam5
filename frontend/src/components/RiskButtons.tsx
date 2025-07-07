@@ -42,19 +42,6 @@ const RiskButtons: React.FC = () => {
         }}
       >
         <span>위험도 조회 (현 위치: 경기도 의왕시)</span>
-        <button
-          onClick={() => (window.location.href = "/shelter")}
-          style={{
-            border: "none",
-            backgroundColor: "#e9ecef",
-            borderRadius: "50%",
-            width: "24px",
-            height: "24px",
-            cursor: "pointer",
-          }}
-        >
-          →
-        </button>
       </div>
 
       <div
