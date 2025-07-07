@@ -1,6 +1,9 @@
+// src/components/NewsList.tsx
+
 import React, { useEffect, useState } from "react";
 import NewsCard from "./NewsCard";
 import NewsModal from "./NewsModal";
+import Pagination from "./Pagination";
 import { newsImages } from "../assets";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -44,8 +47,7 @@ const NewsList: React.FC = () => {
     }
   }, [page]);
 
-  const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
-
+  // 애니메이션
   const variants = {
     enter: (direction: number) => ({
       x: direction > 0 ? 100 : -100,
@@ -113,39 +115,14 @@ const NewsList: React.FC = () => {
           </motion.div>
         </AnimatePresence>
       </div>
-      <div style={{ display: "flex", justifyContent: "center", gap: "0.5rem", marginTop: "1rem",}}>
-        <button
-          onClick={() => handlePageChange(Math.max(page - 1, 1))}
-          disabled={page === 1}
-          style={{
-            width: "30px", height: "30px", borderRadius: "50%",
-            border: "1px solid #ddd", backgroundColor: "#fff", cursor: "pointer"
-          }}
-        >{"<"}</button>
-        {pageNumbers.map((num) => (
-          <button
-            key={num}
-            onClick={() => handlePageChange(num)}
-            style={{
-              width: "30px", height: "30px", borderRadius: "50%",
-              border: "1px solid #ddd",
-              backgroundColor: page === num ? "#e9ecef" : "#fff",
-              fontWeight: page === num ? "bold" : "normal",
-              cursor: "pointer",
-            }}
-          >
-            {num}
-          </button>
-        ))}
-        <button
-          onClick={() => handlePageChange(Math.min(page + 1, totalPages))}
-          disabled={page === totalPages}
-          style={{
-            width: "30px", height: "30px", borderRadius: "50%",
-            border: "1px solid #ddd", backgroundColor: "#fff", cursor: "pointer"
-          }}
-        >{">"}</button>
-      </div>
+
+      {/* 페이지네이션 통일 적용 */}
+      <Pagination
+        page={page}
+        totalPages={totalPages}
+        onPageChange={handlePageChange}
+      />
+
       {/* 모달 */}
       <NewsModal news={selectedNews} onClose={() => setSelectedNews(null)} />
     </section>
