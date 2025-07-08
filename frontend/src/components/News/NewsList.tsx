@@ -3,8 +3,8 @@
 import React, { useEffect, useState } from "react";
 import NewsCard from "./NewsCard";
 import NewsModal from "./NewsModal";
-import Pagination from "./Pagination";
-import { newsImages } from "../assets";
+import Pagination from "../Common/Pagination";
+import { newsImages } from "../../assets";
 import { motion, AnimatePresence } from "framer-motion";
 
 type News = {

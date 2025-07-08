@@ -1,8 +1,8 @@
 import React from "react";
-import Header from "../components/Header";
-import WelcomeMessage from "../components/WelcomeMessage";
-import RiskButtons from "../components/RiskButtons";
-import NewsList from "../components/NewsList";
+import Header from "../components/Common/Header";
+import WelcomeMessage from "../components/Common/WelcomeMessage";
+import RiskButtons from "../components/Common/RiskButtons";
+import NewsList from "../components/News/NewsList";
 
 const HomePage: React.FC = () => {
   return (

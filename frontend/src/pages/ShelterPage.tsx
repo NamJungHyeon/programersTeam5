@@ -1,10 +1,10 @@
 // src/pages/ShelterPage.tsx
 import React, { useState } from "react";
-import Header from "../components/Header";
-import ShelterSearchBar from "../components/ShelterSearchBar";
-import ShelterMap from "../components/ShelterMap";
-import ShelterList from "../components/ShelterList";
-import ShelterDetailModal from "../components/ShelterDetailModal";
+import Header from "../components/Common/Header";
+import ShelterSearchBar from "../components/Shelter/ShelterSearchBar";
+import ShelterMap from "../components/Shelter/ShelterMap";
+import ShelterList from "../components/Shelter/ShelterList";
+import ShelterDetailModal from "../components/Shelter/ShelterDetailModal";
 import { motion } from "framer-motion"; // ★추가!
 
 // 더미 데이터 예시
